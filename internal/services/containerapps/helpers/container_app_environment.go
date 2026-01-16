@@ -4,6 +4,8 @@
 package helpers
 
 import (
+	"strings"
+
 	"github.com/hashicorp/go-azure-helpers/lang/pointer"
 	"github.com/hashicorp/go-azure-sdk/resource-manager/containerapps/2025-07-01/managedenvironments"
 	"github.com/hashicorp/terraform-provider-azurerm/internal/tf/pluginsdk"
@@ -111,8 +113,10 @@ func ExpandWorkloadProfiles(input []WorkloadProfileModel) *[]managedenvironments
 
 		if v.Name != string(WorkloadProfileSkuConsumption) {
 			r.WorkloadProfileType = v.WorkloadProfileType
-			r.MaximumCount = pointer.To(v.MaximumCount)
-			r.MinimumCount = pointer.To(v.MinimumCount)
+			if !strings.HasPrefix(v.WorkloadProfileType, "Consumption") {
+				r.MaximumCount = pointer.To(v.MaximumCount)
+				r.MinimumCount = pointer.To(v.MinimumCount)
+			}
 		} else {
 			r.WorkloadProfileType = string(WorkloadProfileSkuConsumption)
 		}
